@@ -1,7 +1,11 @@
 # Main: this is being used to test and run implemented classes.
 
-import Connect4Board
-import randomVSrandomData
+from Connect4Board import Connect4Board
+from dataGenerator import dataGenerator
 
-new_Board = Connect4Board(1)
-new_Board.game()
+#RunGame = Connect4Board(1)
+#RunGame.game()
+test = dataGenerator(1)
+test.produceRandomData();
+for x in range(len(test.data)):
+    print(test.data[x])

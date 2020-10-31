@@ -11,6 +11,8 @@
     <OutputPath>.</OutputPath>
     <Name>Connect4AI</Name>
     <RootNamespace>Connect4AI</RootNamespace>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,7 +26,7 @@
     <Compile Include="main.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="randomVSrandomData.py">
+    <Compile Include="dataGenerator.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Connect4Board.py" />

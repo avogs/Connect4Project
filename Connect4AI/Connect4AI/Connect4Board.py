@@ -1,20 +1,21 @@
 ## Connect 4
 import matplotlib.pyplot as plt
+import numpy as np
 
 class Connect4Board:
     def __init__(self, startingPlayer):
-        self.board = [[0,0,0,0,0,0,0],
+        self.board = np.array([[0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0],
-                      [0,0,0,0,0,0,0]] # array of ints representing board
-        self.displayBoard = [[0,0,0,0,0,0,0],
+                      [0,0,0,0,0,0,0]]) # array of ints representing board
+        self.displayBoard = np.array([[0,0,0,0,0,0,0],
                              [0,0,0,0,0,0,0],
                              [0,0,0,0,0,0,0],
                              [0,0,0,0,0,0,0],
                              [0,0,0,0,0,0,0],
-                             [0,0,0,0,0,0,0]] # array of ints representing board in a display friendly manner
+                             [0,0,0,0,0,0,0]]) # array of ints representing board in a display friendly manner
         self.heights = [0,0,0,0,0,0,0] # Array of ints showing how full each column is
         self.playerID = startingPlayer # ID of player who moves first
         
@@ -96,8 +97,9 @@ class Connect4Board:
         else:
             self.playerID = 1
     
-    def loadGame(self, moves): # Runs a game from an input array of moves. Returns the winner or 0 if draw or game not over.
-        boardHistory = []
+    def loadGame(self, inputBoard, column): # Runs a game from an input array of moves. Returns the winner or 0 if draw or game not over.
+        self.board = inputBoard
+        return move(column)
         gameOver = False
         i = 0
         while (not gameOver and i < len(moves)):
@@ -143,6 +145,3 @@ class Connect4Board:
                 self.viewBoard()
                 print("Player " + str(self.playerID) + " won!")
                 return self.board
-
-new_Board = Connect4Board(1)
-new_Board.game()
