@@ -3,8 +3,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class Connect4Board:
-    """Class Description..."""
+    """A class which implements a basic connect 4 game."""
     def __init__(self, startingPlayer):
+        """The constructor for a Connect4Board
+        
+        The constructor for this class makes a board instance variable (and a display friendly version),
+        an instance variable storing the heights of each column in the board,
+        and an instance variable holding the playerID."""
         self.board = np.array([[0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0],
@@ -20,22 +25,25 @@ class Connect4Board:
         self.heights = [0,0,0,0,0,0,0] # Array of ints showing how full each column is
         self.playerID = startingPlayer # ID of player who moves first
         
-    def move(self, column): # On win returns player ID, otherwise returns 0 "public method"
-        if (not (column > 6) and not (column < 0)) and (self.heights[column] < 6): # If the move is invalid do nothing
-            self.board[self.heights[column]][column] = self.playerID # Place the token
+    def move(self, column):
+        """Current player makes a move on this Connect4Board, returns 0 if move is invalid or not a win, returns playerID on victory."""
+        if (not (column > 6) and not (column < 0)) and (self.heights[column] < 6): # If move is invalid then skip
+            self.board[self.heights[column]][column] = self.playerID
             if (self._isWin(column, self.heights[column])):
-                return self.playerID # If the token resulted in a win return playerID
-            self.heights[column] += 1 # Update number of tokens in the column
-            self._swapPlayers() # If the move has completeted switch turns to the other player.
+                return self.playerID
+            self.heights[column] += 1
+            self._swapPlayers() # Move has completed so swap turns to the other player.
         return 0 # The move is complete and playerID was swapped or the move was invalid and nothing was done
         
-    def viewBoard(self): # "public method"
+    def viewBoard(self):
+        """Displays the board as a heatmap. Note that this does cause the colors to switch after the first turn. :/"""
         for x in range(0, 6): # updates displayBoard (self.board flipped)
             self.displayBoard[5-x] = self.board[x]
         plt.imshow(self.displayBoard, cmap='hot', interpolation='nearest') # show the board as a heatmap lol :P
         plt.show()
         
-    def _isWin(self, column, row): # "private helper method"
+    def _isWin(self, column, row):
+        """A helper method which checks if adding a token at row, column will cause playerID to win."""
         if ((self._checkLeft(column, row) + self._checkRight(column, row)) > 4):
             return True # Since the placed piece gets counted twice we check for "5+" in a row instead of "4+"
         elif ((self._checkDown(column, row)) > 3): # checkUp is unnessecary since any placed token will be on top of its col
@@ -49,7 +57,6 @@ class Connect4Board:
     
     # Each of these methods checks in the specified direction until it hits an edge of the board
     # or runs out of matching tokens and returns the number of tokens in a line in that direction. 
-    
     def _checkLeft(self, column, row): # "private helper method"
         if ((column != 0) and self.board[row][column-1] == self.playerID):
             return 1 + self._checkLeft(column-1, row)
@@ -92,39 +99,15 @@ class Connect4Board:
         else:
             return 1
     
-    def _swapPlayers(self): # "private helper method" Swaps players :O
+    def _swapPlayers(self):
+        """A helper method which swaps playerID"""
         if (self.playerID == 1):
             self.playerID = 2
         else:
             self.playerID = 1
-    
-    def loadGame(self, inputBoard, column): # Runs a game from an input array of moves. Returns the winner or 0 if draw or game not over.
-        self.board = inputBoard
-        return move(column)
-        gameOver = False
-        i = 0
-        while (not gameOver and i < len(moves)):
-            boardHistory.append((self.board, moves[i]))
-            # If board is full declare a draw
-            gameOver = True
-            for col in range(0,7): # If there are any empty slots left
-                if (self.board[5][col] == 0):
-                    gameOver = False
-                    break
-            # Game is a draw
-            if (gameOver):
-                return 0
-                break
-            column = -1
-            while ((column < 0) or (column > 6)):
-                column = moves[i]
-                i += 1
-            if (self.move(column) != 0):
-                gameOver = True
-                return (boardHistory, self.playerID)
-        return (boardHistory, 0)
             
-    def game(self): # game loop
+    def game(self):
+        """When called this method runs a connect 4 game which runs until a player wins."""
         gameOver = False
         while (not gameOver):
             self.viewBoard()

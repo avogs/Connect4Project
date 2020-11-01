@@ -14,13 +14,14 @@ import copy
 # with a board, a move, and a winner
 
 class dataGenerator:
-    """Class Description..."""
+    """A class which uses Connect4Board to generate training data for a connect 4 AI"""
     def __init__(self, gamesToGenerate):
-        self.numBoards = gamesToGenerate*6*7 # Maximum number of boards generated in this.
+        """Takes an argument for how many games to generate and initializes a list of data."""
         self.gamesToGenerate = gamesToGenerate
         self.data = [] # list of arrays containing the board array, a move, and who won
 
     def produceRandomData(self):
+        """Generates games with 2 randomly players facing each other and records the data and the victor in self.data."""
         offset = 0
         for game in range(self.gamesToGenerate):
             gameBoard = Connect4Board(random.randint(1,2))
@@ -28,7 +29,7 @@ class dataGenerator:
             finished = 0
             listItem = [np.zeros((6,7)),0,0]
             for x in range(0, 42):
-                gameMoves = np.array([(random.sample(range(7),7)) for x in range(6)]).flatten()
+                gameMoves = np.array([(random.sample(range(7),7)) for x in range(6)]).flatten() # Generates 42 moves with no more than 6 of each column.
                 np.random.shuffle(gameMoves)
                 winner = gameBoard.move(gameMoves[x])
                 listItem[1] = gameMoves[x]
@@ -40,6 +41,3 @@ class dataGenerator:
                 listItem[0] = gameBoard.board.copy()
             for x in range(offset-finished, offset):
                 self.data[x][2] = winner
-            
-    #def generateRandomGame(self): # Randomly generates an array of 42 integers between 0 and 6 with no more than 6 repeats of each number.
-    #    [(random.sample(range(7),7)) for x in range(6)]
