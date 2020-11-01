@@ -23,6 +23,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="FromScratchNN.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="main.py">
       <SubType>Code</SubType>
     </Compile>

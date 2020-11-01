@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class Connect4Board:
+    """Class Description..."""
     def __init__(self, startingPlayer):
         self.board = np.array([[0,0,0,0,0,0,0],
                       [0,0,0,0,0,0,0],
