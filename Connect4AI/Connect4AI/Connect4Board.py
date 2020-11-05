@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-class Connect4Board:
+class Connect4Board(object):
     """A class which implements a basic connect 4 game."""
     def __init__(self, startingPlayer):
         """The constructor for a Connect4Board

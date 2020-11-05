@@ -13,7 +13,7 @@ import copy
 # Training data will (for now) be made by random players and will take the form of an array of tuples
 # with a board, a move, and a winner
 
-class dataGenerator:
+class dataGenerator(object):
     """A class which uses Connect4Board to generate training data for a connect 4 AI"""
     def __init__(self, gamesToGenerate):
         """Takes an argument for how many games to generate and initializes a list of data."""

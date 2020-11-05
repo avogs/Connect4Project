@@ -14,7 +14,7 @@ test.produceRandomData()
 # then a final layer where it goes to 7 cells representing each column where a move can be made.
 model = keras.Sequential([
     keras.Input(shape=(43,)),
-    keras.layers.Dense(100, activation=tf.nn.relu),
+    keras.layers.Dense(43, activation=tf.nn.relu),
     keras.layers.Dense(7, activation=tf.nn.softmax)
     ])
 
