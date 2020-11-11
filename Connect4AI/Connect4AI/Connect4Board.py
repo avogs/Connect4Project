@@ -1,5 +1,5 @@
 ## Connect 4
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 
 class Connect4Board(object):
