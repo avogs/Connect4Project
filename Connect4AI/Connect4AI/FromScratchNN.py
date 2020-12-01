@@ -11,52 +11,58 @@ class FromScratchNN(object):
         Goes from from an input layer of length layerSizes[0] to an
         output layer of length of layerSizes[len(layerSizes)]. These
         layers are initialized with 0 as all their parameters."""
-        self.layers = [] # A list of layer objects, ordered from input layer to output layer. Should always have at least 1 element.
+        self.layers = [] # A list of layer objects, ordered from input layer to output layer.  Should
+                         # always have at least 1 element.
         for x in range(1,len(layerSizes)):
-            self.layers.append(self.layer(layerSizes[x-1], layerSizes[x]))
+            self.layers.append(self.layer(layerSizes[x - 1], layerSizes[x]))
 
 
-    def predict(self, input):
+    def modelOutput(self, input):
         """Takes in a data point and runs it through the current model, returns the output of that."""
         nextOutput = input
         for x in range(len(self.layers)):
             nextOutput = self.layers[x].evaluate(nextOutput)
         return nextOutput
 
+    def predict(self, input):
+        """Returns the index of the max element in the array."""
+        return np.argmax(modelOutput(self, input))
 
-    def trainGradientDescent(self, data, labels, gradientSpacing, learningRate, epochs):
-        """A simple gradient descent implementation, takes data, labels, a spacing scalar for the numeric gradient evaluation, a learning rate scalar, and a number of iterations.
-        
-        A FromScratchNN object should first be made and given layer parameters, then this can be invoked and the parameters will be procedurally updated
-        for each epoch. Note that the numerical gradient used is time intensive and may yield subpar results on very small spacing due to rounding errors.
-        This uses a sum of squared errors cost function by default, others may be added later."""
+
+    def trainGradientDescent(self, data, labels, gradientSpacing, learningRate, epochs, batchSize=1):
+        """Trains the neural network using a stochastic batch gradient descent."""
+        # Note that this uses a numerical gradient, which can have significant
+        # rounding errors and will usually be highly time intensive.
+        # A more advanced method should use automatic differentiation or
+        # something similar but that is out of the scope of this project (for
+        # now).
+        rand = np.random.default_rng()
         for x in range(epochs):
-            # Print status at start of epoch
+            batch_indices = rand.choice(len(data), size = batchSize)
+            batch_data = data[batch_indices]
+            batch_labels = labels[batch_indices]
             print("Beginning epoch: " + str(x))
-            print("Current cost: " + str(self.cost(data, labels)))
-            # Arrange parameters into an array and take the gradient in parameter space to see which change will decrease the average cost the most.
-            negativeGradients = -self.numericGradient(self.parameterSpaceCostField(gradientSpacing, data, labels), gradientSpacing)
-            paramToChange = np.argmax(negativeGradients)
-            # Change the parameter with the highest negative gradient
+            print("Current cost: " + str(self.cost(batch_data, batch_labels)))
+            gradients = self.numericGradient(self.parameterSpaceCostField(gradientSpacing, batch_data, batch_labels), gradientSpacing)
+            counter = 0
             for layer in self.layers:
-                paramToChange -= len(layer.biases)
-                if (paramToChange < 0):
-                    paramToChange += len(layer.biases)
-                    layer.biases[paramToChange] += negativeGradients[paramToChange]*learningRate
-                    break
-                for i in range(len(layer.weights)):
-                    paramToChange -= len(layer.weights[i])
-                    if (paramToChange < 0):
-                        paramToChange += len(layer.weights[i])
-                        layer.weights[i][paramToChange] += negativeGradients[paramToChange]*learningRate
-                        break
+                for index in range(len(layer.biases)):
+                    layer.biases[index] -= gradients[counter] * learningRate
+                    counter += 1
+                for row in range(len(layer.weights)):
+                    for entry in range(len(layer.weights[row])):
+                        layer.weights[row][entry] -= gradients[counter] * learningRate
+                        counter += 1
 
     def cost(self, data, labels):
         """A function which takes in labelled data and outputs the average squared error on that for the current model."""
         SSE = 0
+        label = np.zeros(len(self.layers[len(self.layers) - 1].biases))
         for x in range(len(data)):
-            SSE += np.sum((labels[x] - self.predict(data[x]))**2)
-        return (SSE/len(data))
+            label[labels[x]] = 1
+            SSE += np.sum((label - self.modelOutput(data[x])) ** 2)
+            label[labels[x]] = 0
+        return (SSE / len(data))
 
     def parameterSpaceCostField(self, gradientSpacing, data, labels):
         """Iterates through each parameter in the neural network and canges it be gradientSpacing then evaluates the cost on given data and labels.
@@ -72,12 +78,13 @@ class FromScratchNN(object):
         
         # Begin iterating through parameters and evaluating costs.
         x = 0
+        middle_cost = self.cost(data, labels)
         for layer in self.layers:
             for i in range(len(layer.biases)):
                 layer.biases[i] -= gradientSpacing
                 field[x][0] = self.cost(data, labels)
                 layer.biases[i] += gradientSpacing
-                field[x][1] = self.cost(data, labels)
+                field[x][1] = middle_cost
                 layer.biases[i] += gradientSpacing
                 field[x][2] = self.cost(data, labels)
                 layer.biases[i] -= gradientSpacing
@@ -87,7 +94,7 @@ class FromScratchNN(object):
                     weightRow[i] -= gradientSpacing
                     field[x][0] = self.cost(data, labels)
                     weightRow[i] += gradientSpacing
-                    field[x][1] = self.cost(data, labels)
+                    field[x][1] = middle_cost
                     weightRow[i] += gradientSpacing
                     field[x][2] = self.cost(data, labels)
                     weightRow[i] -= gradientSpacing
@@ -99,14 +106,15 @@ class FromScratchNN(object):
         """A basic numeric gradient calculator. Takes a 3 column input and a spacing scalar and outputs a single column representing the gradients of the input."""
         gradients = np.zeros(len(input))
         x = 0
+        spacing_2 = 2 * spacing
         for row in input:
-            gradients[x] = (((row[1] - row[0]) + (row[2] - row[1]))*0.5)/spacing
+            gradients[x] = (row[2] - row[0]) / spacing_2
             x += 1
         return gradients
 
 
     class layer(object):
-        """A subclass which can hold a single layer of a neural network."""
+        """A subclass which holds a layer of a neural network."""
 
         def __init__(self, inputLen, outputLen):
             """Initializes a layer's weights and biases. (maybe should be random instead of zero?)"""
